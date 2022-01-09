@@ -62,6 +62,65 @@ v8에서 최적화를 진행하기 위해 Schedule과정을거치게 된다.
 
 V8에서는 Turbofan을 이용해 메모리 사용량을 감소시키고, 실행시간을 단축하며, 코드의 크기를 줄여 빠른속도의 엔진이 되었다.
 
+# 자바 스크립트 이벤트 루프
+
+자바스크립트의 큰 특징중 하나는 '단일 스레드'기반의 언어라는 점이다. 이말은 동시에 하나의 작업만을 처리할 수 있다라는 말이다. 하지만 자바스크립트 환경에서는 많은 작업이 동시에 처리되고 있다. 어떻게 자바스크립트는 동시성을 지원하는걸까?
+
+이떄 등장하는 개념이 이벤트 루프이다. 
+
+자비스크립트의 '단일 스레드'기반의 언어라는 말은 `자바스크립트 엔진이 단일 호출 스택을 사용한다` 는 관점에서만 사실이다. 실제 자바스크립트가 구동되는 환경에서는 주로 여러개의 스레드가 사용되며 이런 환경이
+단일 호출 스택을 사용하는 자바 스크립트 엔진과 상호 여농하기 위해 사용하는 장치가 `이벤트 루프`인 것이다.
+
+브라우저 환경을 그림으로 나타내면 아래와 같다.
+![](IMG/event_loop.png)
+
+* 콜 스택 : 소스코드 평가 과정에서 생성된 실행 컨택스트가 추가되고 제거되는 스택 자료구조. 함수를 호출하면 실행 컨택스트가 순차적으로 실행된다. 자바스크립트 엔진은 단 하난의 콜 스택을 사용하기 때문에 최상위 실행 컨텍스트가 종료되어 콜 스택에서 제거되기 전까지는 다른 어떤 태스크도 실행되지 않는다.
+* 힙 : 힙은 객체가 저장되는 메모리 공간이다. 콜 스택의 요소인 실행 컨텍스트는 힙에 저장된 객체를 잠조한다.
+
+이처럼 콜 스택과 힙으로 구성되어있는 자바스크립트 엔진은 단순해 태스크가 요청되면 콜 스택을 통해 요청된 작업을 순차적으로 실행할 뿐이다. 
+
+* 태스크 큐 : 비동기 함수의 콜백 함수 도는 이벤트 핸들러가 일시적이로 보관되는 영역
+* 이벤트 루프 : 이벤트 루프는 콜 스택에 현재 실행중인 실행 컨택스트가 있는지, 그리고 태스크 큐에 대기중인함수가 있는지 반복적으로 학인한다. 콜 스택이 비어있고 태스크 큐에 대기중인 함수가 있다면, 이벤트 루프는 순차적으로 태스크 큐에 대기중인 함수를 콜 스택으로 이동시킨다.
+
+### 브라우저 환경에서 이벤트 루프 예시
+
+```js
+
+console.log('first')
+
+setTimeout(function cb() {
+    console.log('second')
+}, 1000); // 0ms 뒤 실행
+
+console.log('third')
+//먼저 실행될 함수는 ?
+```
+
+1. console.log('first')가 `Call Stack`에 추가된다.
+![](IMG/event1.png)
+2. console.log('first')가 실행되어 화면에 출력한뒤 `Call Stack`에서 제거된다.
+![](IMG/event2.png)
+3. setTimeout(function cb(){})이 `Call Stack`에 추가된다.
+![](IMG/event3.png)
+4. setTimeout 함수가 실행되면서 브라우저가 제공하는 timer Web API를 
+호출한다. 그후 `Call Stack`에서 제거된다.
+![](IMG/event4.png)
+5. console.log('thrid')가 `Call Stack`에 추가된다.
+![](IMG/event5.png)
+6. console.log('thrid')가 실행되어 화면에 출력되고 `Call Stack`에서 제거된다.
+![](IMG/event6.png)
+7. setTimeout함수에 전달한 0ms(4ms)시간이 지난뒤 `Call Stack`으로 전달한 cb함수가 `Callback Queue`에 추가된다.
+![](IMG/event7.png)
+8. `Event Loop`는 `Call Stack`이 비어있는것을 확인하고, `Callback Queue`를 살펴본다. cb를 발견한 `Event Loop`는 `Call Stack`에 cb를 추가한다.
+![](IMG/event8.png)
+9.  cb함수가 실해되고 내부의 console.log('second')가 `Call Stack`에 추가된다.
+![](IMG/event9.png)
+10. console.log('second')가 회면에 출력되고 `Call Stack`에서 제거된다.
+![](IMG/event0.png)
+11. cb가 `Call Stack`에서 제거된다.
+![](IMG/event11.png)
+
+
 ------
 references
 
@@ -70,3 +129,7 @@ https://helloinyong.tistory.com/290#recentEntries
 https://shlrur.github.io/javascripts/javascript-engine-fundamentals-shapes-and-Inline-caches/
 
 [overall](https://pks2974.medium.com/v8-%EC%97%90%EC%84%9C-javascript-%EC%BD%94%EB%93%9C%EB%A5%BC-%EC%8B%A4%ED%96%89%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95-%EC%A0%95%EB%A6%AC%ED%95%B4%EB%B3%B4%EA%B8%B0-25837f61f551)
+
+event loop 
+
+https://medium.com/sjk5766/javascript-%EB%B9%84%EB%8F%99%EA%B8%B0-%ED%95%B5%EC%8B%AC-event-loop-%EC%A0%95%EB%A6%AC-422eb29231a8
