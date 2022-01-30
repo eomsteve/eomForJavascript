@@ -1,3 +1,4 @@
+
 # 믹스인
 
 한 객체의 프로퍼티를 다른 객체에 복사해 사용하는 패턴, 이 패턴은 주로 기존에있던 객체의 기능을 그대로 보전하면서 다른 객체에 추가할때 사용한다.
@@ -138,3 +139,4 @@ reference
 https://ko.javascript.info/mixins
 https://im-developer.tistory.com/141
 https://velog.io/@moggy/Javascript-%EB%AF%B9%EC%8A%A4%EC%9D%B8-%EA%B8%B0%EB%B2%95Mixin-technique
+
