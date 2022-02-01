@@ -223,3 +223,198 @@ Promise.allSettled([
 
 * 프로미스가 `fulfilled`상태일 경우 비동기 처리 상태를 나타내는 `status` 프로퍼티와 처리 결과를 나타내는 `value`프로퍼티를 갖는다.
 * 프로미스가 `rejected`상태일 경우 비동기 처리 상태를 나타내는 `status` 프로퍼티와 에러를 나타내는 `reason`프로퍼티를 갖는다.
+
+
+# async/ await
+
+async await 는 프로미스를 시반으로 동작한다. 프로미스의 후속 처리 메서드 없이 마치 동기 처리처럼 프로미스가 처리 결과를 반환하도록 구현할 수 있다.
+
+### async 함수
+`await`키워드는 반드시 `async`함수 내부에서 사용해야 한다. async함수는 async 키워드를 사용해 정의하며 언제나 프로미스를 반환한다. async 함수가 명시적으로 프로미스를 반환하지 않더라도 async 함수는 암묵적으로 resolve 하는 프로미스를 반환한다.
+
+```js
+async function foo(n) {return n;}
+foo(1).then(v => console.log(v)); //1
+
+const bar = async function(n) {return n;}
+bar(2).then(v=> console.log(v)); // 2
+
+const baz = async n => n;
+baz(3).then(v=> console.log(v));// 3
+
+const obj = {
+  async foo(n) {return n;}
+};
+obj.foo(4).then(v => console.log(v)); // 4
+```
+
+클래스의 생성자 메서드는 async 메서드가 될 수없다. 클래스의 생성자 메서드는 인스턴스를 반환해야 하지만 async 메서드는 항상 프로미스를 반환하기 때문이다.
+
+### await
+
+`await` 키워드는 피로미스가 settled상태(비동기 처리가 수행된 상태)가 될 떄까지 대기 하다가 settled 상태가 되면 프로미스가 resolve한 처리 결과를 반환한다. await 키ㄷ워드는 반드시 프로미스 앞에서 사용해야 한다. 
+
+```js
+const fetch =require('node-fetch');
+
+const getGithubUserName = async id =>{
+  const res = await fetch(`https://api.github.com/users/${id}`);
+  const { name } = await res.json();
+  console.log(name); 
+};
+```
+
+프로미스가 settled 상태가 되면 프로미스가 resolve한 처리 결과가 res변수에 할당된다. 이처럼 await 키워드는 다음 실행을 일시 중지시켰다가 프로미스가 settled 상태가 되면 다시 재개한다. 
+
+## await for of
+
+각 Array에 대한 아이템을 비동기처리를 해야하는 경우가 생긴다. 예를들어 for 반복을 통해 ajax를 처리하는 경우가 있다. 이때 forEach 문을 통해 객체를 순회하는 방법을 떠올리기 쉽다.
+
+```js
+async function foo(array){
+  array.forEach(item => {
+    await innerFunc(item);
+  })
+}
+```
+위 예제의 경우 SyntaxError를 반환한다. 이유는 forEach내에 async 키워드를 달어주어야 await 키워드를 사용할 수 있기 때문이다. 
+
+```js
+async function foo(array){
+  array.forEach(async (item) => {
+    await innerFunc(item);
+  })
+}
+```
+그럼 forEach 안에 콜백함수에 async를 달아 문법 오류를 고쳐보았다. 실행은 문제없이 잘 되지만 비동기처리를 하는것처럼 작동하지 않는다. 왜냐하면
+forEach의 경우 해당 반복이 종료되는것에 대한 결과를 기다려주지 않는다.
+
+반복문을 돌며 함수내의 내용을 처리만 하기 때문에 관련된 array를 병렬로 순차 실행하는 것은 다르게 처리를 해줘야 한다.
+
+**for await of** 구문은 반복문 내부에서 실행되는 비동기 서비스들에 대한 순서를 보장해준다. 
+
+```js
+const names = ['a', 'b', 'c', 'd'];
+
+namse.forEach(async (name)=>{
+  const result = await getServerId(name);
+  consoel.log(result.json());
+});
+
+console.log('서비스 종료');
+```
+a, b, c, d 이름을 넣어 유저의 id를 가져오는 프로미스를 반복해 반환하는 위와같은 기능이 있다. 위 예제의 결과는
+```
+서비스 종료
+{'a' : 0}
+{'b' : 0}
+{'c' : 0}
+{'d' : 0}
+{'e' : 0}
+```
+서비스 종료가 맨 먼저 찍히게 된다. 위에 말한대로 forEach는 비동기 작업에 대한 순서를 보장하지 않는다. 위의 코드를 for await of를 사용하면 아래와 같다.
+
+```js
+const names = ['a', 'b', 'c', 'd'];
+
+for await (let name of names){
+  const result = await getServerId(name);
+  consoel.log(result.json());
+});
+
+console.log('서비스 종료');
+```
+출력 결과
+```
+{'a' : 0}
+{'b' : 0}
+{'c' : 0}
+{'d' : 0}
+{'e' : 0}
+서비스 종료
+```
+
+## try catch
+에러에 대해 대처하지않고 방치하면 프로그램은 강제 종료된다. `try...catch`문을 사용ㅇ해 발생한 에러데 적절하게 대응하면 프로그램이 강제 종료되지 않고 계속해서 코드를 실행 시킬 수 있다.
+
+```js
+try{
+  // 실행할 코드 (에러가 발생할 가능성이 있는 코드)
+}catch(err){
+  // try 코드 블럭에서 에러가 발생하면 이 코드 블록의 코드가 실행된다.
+  // err에는 try코드블럭에서 발생한 Error객체가 전달된다.
+}finally{
+  // 에러 발생과 상관없이 반드시 한번 실행된다.
+}
+```
+
+비동기 처리 콜백 패턴의 단점 중 가장 심각한것은 에러 처리가 곤란하다는 것이다. 에러는 호출자 방향으로 전파된다. 즉 콜 스택의 아래방향으로 전파된다. 
+```js
+const foo = () => {
+  throw new Error('Something Wrong');
+}
+const bar = () => {
+  foo();
+}
+const baz = () => {
+  bar();
+}
+
+try{
+  baz();
+}catch(err){
+  console.error(err);
+}
+```
+baz 함수를 호출하면 ,bar 함수가 호출되고 bar 안에서 foo함수가 호출되고 , foo함수는 throw를 통해 에러 객체를 던진다. 에러는 `foo -> bar -> baz -> 전역 실행 컨텍스트` 로 전파되어 전역에서 catch된다. 
+
+하지만 비동기 함수의 콜백 함수를 호출한 것은 비동기 함수가 아니기 떄문에 try...catch문을 사용해 에러를 캐치할 수 없다.
+
+```js
+try{
+  setTimeout(() => { throw new Error('Something Wrong'); }, 1000);
+}catch(err){
+  console.error(err); //에러를 캐치하지 못한다.
+}
+```
+`async/await`에서 에러 처리는 try...catch문을 사용할 수 있다. 콜백함수를 인수로 전달받는 비동기 함수와는 달리 프로미스를 반환하는 비동기 함수는 명시적으로 호출할 수 있기 때문에 호출자가 명확하다.
+
+```js
+const fetch = require('node-fetch');
+
+const foo = async () => {
+  try{
+    const wrongUrl = 'http://worng.Url';
+    const res = await fetch(wrongUrl);
+    const data = await res.json();
+    consol.log(data);
+  }catch(err){
+    console.error(err);
+  }
+};
+
+foo();
+```
+위 예제의 foo함수의 catch문은 HTTP 통신에서 발생한 에러 뿐만 아니라, try코드 블록내의 모든 문에서 발생한 일반적인 에러까지 모두 캐치할 수 있다.
+
+async 함수 내에서 catch문을 사용해서 에러 처리를 하지 않으면 async함수는 발생한 에러를 reject하는 프로미스를 반환한다.
+
+```js
+//후속 처리 메서드를 활용한 에러캐치
+const fetch = require('node-fetch');
+
+const foo = async () => {
+    const wrongUrl = 'http://worng.Url';
+    const res = await fetch(wrongUrl);
+    const data = await res.json();
+    return data;
+};
+
+foo()
+    .then(consol.log)
+    .catch(console.error);
+```
+--------------------------------
+reference
+
+https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/for-await...of
