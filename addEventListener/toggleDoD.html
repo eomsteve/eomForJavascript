@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>myToggle</title>
+  <style>
+    .btn{
+      height:90px;
+      width:300px;
+      position:absolute;
+      top: 43%;
+      right:40%;
+      border-radius: 10px;
+      font-size: 50px;
+    }
+  </style>
+</head>
+<body>
+  <button class="btn" value="1" style="border:none;">on</button>
+</body>
+<script>
+  const btn = document.querySelector('.btn');
+  btn.value = sessionStorage.getItem('toggleBtn');
+
+  
+  function toggleStyle(a){
+    if(a == 0){
+    btn.innerHTML = 'off';
+    btn.style.backgroundColor = 'red';
+    btn.style.color = 'white';
+  }else{
+    btn.innerHTML = 'on';
+    btn.style.backgroundColor = 'blue';
+    btn.style.color = 'white';
+  }
+  }
+  
+  toggleStyle(btn.value)
+
+  btn.addEventListener('click',(e)=>{
+    if (e.target.value == 1){
+      e.target.value = 0;
+      sessionStorage.setItem('toggleBtn', e.target.value);
+      btn.innerHTML = 'off';
+    btn.style.backgroundColor = 'red';
+    btn.style.color = 'white';
+    }else{
+      e.target.value = 1;
+      sessionStorage.setItem('toggleBtn', e.target.value);
+      btn.innerHTML = 'on';
+    btn.style.backgroundColor = 'blue';
+    btn.style.color = 'white';
+    }
+  })
+</script>
+</html>
