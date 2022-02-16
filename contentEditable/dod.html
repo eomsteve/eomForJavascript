@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>contenteditable</title>
+  <style>
+    .content{
+      width: 300px;
+      height: 200px;
+      border: 1px solid black;
+    }
+    div{
+      width: 300px;
+      height: 200px;
+      border: 1px solid black;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .effect{
+      font-weight: bold;
+      font-size: 2rem;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="content" contenteditable="true">
+
+  </div>
+  <div class="effect">
+    
+  </div>
+  <script>
+    const editable = document.querySelector('.content');
+    const effect = document.querySelector('.effect');
+
+    editable.addEventListener('input', e => {
+      effect.innerHTML = e.target.innerHTML;
+      if (e.target.innerHTML.length % 2 == 0)  {
+        effect.style.color = 'blue';
+      }else{
+        effect.style.color = 'rebeccapurple';
+      }
+    });
+  </script>
+</body>
+</html>
