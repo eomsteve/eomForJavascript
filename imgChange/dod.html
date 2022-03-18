@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>image</title>
+  <style>
+    input[type="file"]{
+      display : none;
+    }
+    .image{
+      border : 1px solid black;
+      display: block;
+      background-size: 300px 400px;
+      height: 400px;
+      width: 300px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <input type="file">
+  <div class="image">
+    누르면 이미지 변경
+  </div>
+  <script>
+    const imageBtn = document.querySelector('.image');
+    const imgchage = document.querySelector('input[type="file"]');
+
+
+    imageBtn.addEventListener('click', e => {
+      let change = async () => {
+        await imgchage.click();
+        // 메모리에 상주중인 이미지 url 해제
+        await window.URL.revokeObjectURL(imgSrc);
+      }
+      change();
+    })
+
+    imgchage.addEventListener('change', e => {
+      // 선택한 이미지를 url로 만든다!
+      let imgSrc = window.URL.createObjectURL(imgchage.files[0]);
+      imageBtn.style.backgroundImage = `url('${imgSrc}')`;
+    })
+  </script>
+</body>
+</html>
