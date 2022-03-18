@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- 어트리뷰트 -->
+  <!-- <button onclick="handleClick()">Click me</button>
+  <script>
+    function handleClick() {
+      console.log(this); // window
+    }
+  </script> -->
+  <button class="btn1">0</button>
+  <button class="btn2">0</button>
+  <script>
+    const button1 = document.querySelector('.btn1');
+    const button2 = document.querySelector('.btn2');
+
+    button1.onClick = function(e) {
+      console.log(this); // this는 이벤트를 바인딩한 dom 요소를 가리킨다 -> button1
+      console.log(e.currentTarget); //button1
+      console.log(this === e.currentTarget); //True
+
+      this.textContent++; //button1의 textContent를 1올린다.
+    }
+
+    button2.addEventListener('click', function(e){
+      console.log(this); // button2
+      console.log(e.currentTarget); //button2
+      console.log(this === e.currentTarget); //True
+
+      this.textContent++; //button2의 textContent를 1올린다.
+    })
+  </script>
+</body>
+</html>
