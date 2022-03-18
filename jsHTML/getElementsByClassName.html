@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <ul>
+    <li class="fruit apple">Apple</li>
+    <li class="fruit banana">Banana</li>
+    <li class="fruit orange">Orange</li>
+  </ul>
+  <script>
+    const elems = document.getElementsByClassName('fruit');
+    [...elems].forEach(fruit => {fruit.style.color = 'orange';});
+
+    const apple = document.getElementsByClassName('fruit apple');
+    [...apple].forEach(apple => {apple.style.color = 'red';});
+  </script>
+</body>
+</html>

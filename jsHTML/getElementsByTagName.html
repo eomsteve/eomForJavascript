@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <ul id="fruit">
+    <li >Apple</li>
+    <li >Banana</li>
+    <li >Orange</li>
+  </ul>
+  <script>
+    //태그 이름이 li인 요소 노드를 모두 탐색하여 반환한다.
+    // 탐색된 요소 노드들은 HTMLCollection객체에 담겨 반환된다.
+    // 반환된 객체는 유사 배열 객체이면서 이터러블이다.
+    const liTag = document.getElementsByTagName('li');
+    
+    //취득한 모든 요소 노드의 style.color프로퍼티 값을 변경한다.
+    //객체를 배열로 변환하여 순회하며 변경한다.
+    [...liTag].forEach(tag => {tag.style.color='blue';});
+  </script>
+
+
+<!-- Element.prototype.getElementsByTagName -->
+
+  <ul>
+    <li>HTML</li>
+  </ul>
+  <script> 
+    const listFromDocument = document.getElementsByTagName('li');
+    console.log(listFromDocument); // HTMLCollection(4) [li,li,li,li]
+
+    const fruits = document.getElementById('fruit');
+    const liesFromFruits = fruits.getElementsByTagName('li');
+    console.log(listFromFruits); // HTMLCollection(3) [li,li,li]
+  </script>
+</body>
+</html>

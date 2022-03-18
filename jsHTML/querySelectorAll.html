@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <ul>
+    <li class="fruit apple">Apple</li>
+    <li class="fruit banana">Banana</li>
+    <li class="fruit orange">Orange</li>
+  </ul>
+  <script>
+    const elem = document.querySelectorAll('ul > li');
+    conosle.log(elem); // NodeList(3) [li.apple, li.banana, li.orange]
+    elem.forEach(elem => {elem.style.color = 'red';});
+  </script>
+</body>
+</html>
